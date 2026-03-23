@@ -8,7 +8,7 @@ Implementation of the classic 12-1 price momentum factor (Jegadeesh & Titman, 19
 
 On an investable mid/large cap universe (2000–2025), the 12-1 momentum factor delivers **8.9% annualized return** with a **win rate of 59.6%** on the long leg. The long-short factor spread is positive but **not statistically significant** on this universe and period — consistent with the known finding that momentum is strongest in smaller, less efficient stocks that are excluded from an investable universe.
 
-The value factor (see [value-factor-harvesting](../value-factor-harvesting)) achieves statistical significance on the same universe and pipeline, confirming the infrastructure is sound. The momentum result is an honest reflection of the factor's behavior under investability constraints.
+The value factor (see [value-factor-harvesting](https://github.com/qa66an/value-factor-harvesting)) achieves statistical significance on the same universe and pipeline, confirming the infrastructure is sound. The momentum result is an honest reflection of the factor's behavior under investability constraints.
 
 ---
 
