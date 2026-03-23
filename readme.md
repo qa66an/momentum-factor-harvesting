@@ -1,14 +1,14 @@
 # momentum-factor-harvesting
 
-Implementation of the classic 12-1 price momentum factor (Jegadeesh & Titman, 1993) on a fully investable US equity universe using point-in-time data. Built to document that the momentum premium is real, reproducible, and structurally consistent with the academic literature — even after accounting for investability constraints.
+Implementation of the classic 12-1 price momentum factor (Jegadeesh & Titman, 1993) on a fully investable US equity universe using point-in-time data. Built to document that the momentum premium is real and reproducible — and to honestly assess its statistical properties on an investable mid/large cap universe.
 
 ---
 
 ## Finding
 
-On an investable mid/large cap universe (2000–2025), the 12-1 momentum factor delivers **8.9% annualized return** with a **win rate of 59.6%** on the long leg. The long-short factor spread is positive and persistent across most years, confirming the momentum premium documented in the literature.
+On an investable mid/large cap universe (2000–2025), the 12-1 momentum factor delivers **8.9% annualized return** with a **win rate of 59.6%** on the long leg. The long-short factor spread is positive but **not statistically significant** on this universe and period — consistent with the known finding that momentum is strongest in smaller, less efficient stocks that are excluded from an investable universe.
 
-The absolute return underperforms SPY (9.6%) on this period — consistent with the known finding that the momentum premium is strongest in smaller, less efficient stocks. The long-short construction delivers a **positive Sharpe of 0.34** and a **win rate of 60%**, confirming the factor signal is real on an investable universe.
+The value factor (see [value-factor-harvesting](../value-factor-harvesting)) achieves statistical significance on the same universe and pipeline, confirming the infrastructure is sound. The momentum result is an honest reflection of the factor's behavior under investability constraints.
 
 ---
 
@@ -55,12 +55,12 @@ No lookahead bias. All signals use data available as of the ranking date.
 
 ### Overall Performance (2000–2025)
 
-| Strategy                   | Annual Return | Sharpe | Win Rate | Max Drawdown |
-| -------------------------- | ------------- | ------ | -------- | ------------ |
-| Long only (top decile)     | 8.9%          | 0.34   | 59.6%    | -62.2%       |
-| Short only (bottom decile) | -4.7%         | -0.13  | 48.7%    | -97.8%       |
-| Long-Short (factor)        | 3.9%          | 0.14   | 59.9%    | -78.9%       |
-| SPY (benchmark)            | 9.6%          | ~0.45  | —        | -51.0%       |
+| Strategy                   | Annual Return | Sharpe | T-Stat | P-Value | Win Rate | Max Drawdown |
+| -------------------------- | ------------- | ------ | ------ | ------- | -------- | ------------ |
+| Long only (top decile)     | 8.9%          | 0.34   | 1.75   | 0.081   | 59.6%    | -62.2%       |
+| Short only (bottom decile) | -4.7%         | -0.13  | -0.66  | 0.511   | 48.7%    | -97.8%       |
+| Long-Short (factor)        | 3.9%          | 0.14   | 0.69   | 0.490   | 59.9%    | -78.9%       |
+| SPY (benchmark)            | 9.6%          | ~0.45  | —      | —       | —        | -51.0%       |
 
 ### Year-by-Year Long-Short Returns
 
@@ -97,11 +97,23 @@ No lookahead bias. All signals use data available as of the ranking date.
 
 ## Discussion
 
-### Why the long leg doesn't beat SPY on this universe
+### Statistical significance
 
-The momentum premium is well documented to be strongest among smaller, less liquid stocks (Israel & Moskowitz, 2013). By filtering to an investable universe, we sacrifice raw return in exchange for implementability. The factor signal is real — positive Sharpe, 60% win rate, persistent spread — but the absolute return is compressed relative to academic studies that include micro-caps.
+```
+Long-Short T-Stat:  0.69  → not statistically significant
+Long-Short P-Value: 0.49  → cannot reject null hypothesis
+Long only T-Stat:   1.75  → borderline (significant at 90%, not 95%)
+```
 
-This is consistent with O'Shaughnessy (2011), who documents 17% annual return for 6-1 momentum on an all-stocks universe including micro-caps, vs 13% for the all-stocks benchmark — a ~31% excess return spread. On an investable universe ($200M inflation-adjusted), we document the same factor with a ~29% spread over SPY, confirming the premium exists but is partially arbitraged away in large, liquid names.
+The 12-1 momentum factor does not achieve statistical significance on this investable universe over the 2000–2025 period. This is an honest result, not a pipeline failure — the same pipeline produces a statistically significant result for the value factor (T-Stat 2.82, P-Value 0.005), confirming the infrastructure is correctly implemented.
+
+### Why momentum is not significant here but value is
+
+Two structural reasons:
+
+**1. Universe constraint.** The momentum premium is documented to be strongest in small and micro-cap stocks (Israel & Moskowitz, 2013). The inflation-adjusted $200M filter excludes precisely the stocks where the signal is strongest. O'Shaughnessy (2011) documents 17% annualized for 6-1 momentum on an all-stocks universe — the premium compresses significantly on a mid/large cap investable universe.
+
+**2. Time period.** The 2000–2025 sample is dominated by two extended bull markets (2003–2007, 2009–2021) interrupted by severe momentum crashes (2009, 2003). Value is more stable across regimes; momentum is regime-dependent and its crash risk (Daniel & Moskowitz, 2016) reduces statistical power over shorter samples.
 
 ### The short leg
 
@@ -110,6 +122,10 @@ The short leg exhibits near-zero negative returns with high volatility — a kno
 ### Momentum crashes
 
 2009 and 2003 show severe drawdowns on the long-short factor, consistent with the documented momentum crash phenomenon (Daniel & Moskowitz, 2016). These crashes occur when prior losers snap back violently after a market selloff, hurting the short leg disproportionately.
+
+### Comparison with O'Shaughnessy
+
+On an all-stocks universe including micro-caps, O'Shaughnessy documents ~31% excess return spread for 6-1 momentum over the benchmark. This implementation on an investable universe with 12-1 signal delivers a positive but statistically insignificant spread — confirming the premium exists in the data directionally but is not reliably harvestable at institutional scale without accessing smaller, less liquid names.
 
 ---
 
@@ -143,8 +159,9 @@ momentum-factor-harvesting/
 duckdb
 pandas
 numpy
+scipy
 pandas_market_calendars
-dateutil
+python-dateutil
 ```
 
 ---

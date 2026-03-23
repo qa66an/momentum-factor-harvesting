@@ -4,6 +4,7 @@ import pandas as pd
 from dateutil.relativedelta import relativedelta
 import pandas_market_calendars as mcal
 import numpy as np
+from scipy import stats
 
 
 def create_sep_db(csv_path, db_path="./db_files/sep.duckdb"):
@@ -527,12 +528,15 @@ def create_top_and_bottom_deciles(file, top_decile_path, bottom_decile_path):
 
 def get_stats(r, label):
     cum = (1 + r).cumprod()
+    t_stat, p_value = stats.ttest_1samp(r.dropna(), 0)
     return {
         "Strategy": label,
         "Avg Monthly Return": r.mean(),
         "Annualized Return": (1 + r.mean()) ** 12 - 1,
         "Annualized Vol": r.std() * np.sqrt(12),
         "Sharpe Ratio": (r.mean() / r.std()) * np.sqrt(12),
+        "T-Stat": t_stat,
+        "P-Value": p_value,
         "Win Rate": (r > 0).mean(),
         "Best Month": r.max(),
         "Worst Month": r.min(),
